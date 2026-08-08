@@ -1,6 +1,6 @@
 [build]
   base    = "frontend"
-  publish = "frontend"
+  publish = "."
 
 # Redirect all API calls to your Render backend
 [[redirects]]
