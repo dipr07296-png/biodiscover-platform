@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BioDiscover — Drug Discovery & Bioinformatics Platform</title>
+  <meta name="description" content="AI-powered drug discovery and bioinformatics platform. Analyze sequences, explore drug targets, and accelerate your discovery pipeline." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧬</text></svg>" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar-bbt" id="main-navbar">
+  <a href="index.html" class="navbar-brand-bbt">
+    <div class="brand-icon">🧬</div>
+    <span class="brand-text">BioDiscover</span>
+  </a>
+  <ul class="navbar-nav-bbt">
+    <li><a href="index.html" class="nav-link-bbt active">Home</a></li>
+    <li><a href="dashboard.html" class="nav-link-bbt">Dashboard</a></li>
+    <li><a href="sequence.html" class="nav-link-bbt">Sequence Analysis</a></li>
+    <li><a href="molecules.html" class="nav-link-bbt">Molecule Library</a></li>
+    <li><a href="targets.html" class="nav-link-bbt">Drug Targets</a></li>
+  </ul>
+  <div class="navbar-actions">
+    <a href="sequence.html" class="btn-primary-bbt">🔬 Start Analysis</a>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero-section" id="home">
+  <canvas id="hero-canvas"></canvas>
+
+  <!-- Particle background -->
+  <div class="particle-bg" id="particle-bg"></div>
+
+  <div class="container hero-content">
+    <div class="row align-items-center min-vh-100">
+      <div class="col-lg-7 animate-slide-left">
+        <div class="hero-eyebrow">Bioinformatics Platform v2.0</div>
+        <h1 class="hero-title">
+          Accelerate<br/>
+          <span class="gradient-word">Drug Discovery</span><br/>
+          with AI Biology
+        </h1>
+        <p class="hero-description">
+          A comprehensive platform for sequence analysis, molecular docking, 
+          drug target exploration, and pipeline management — powered by Biopython 
+          and real bioinformatics algorithms.
+        </p>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap">
+          <a href="sequence.html" class="btn-primary-bbt" style="font-size:1rem;padding:14px 32px">
+            🧬 Analyze Sequence
+          </a>
+          <a href="dashboard.html" class="btn-outline-bbt" style="font-size:1rem;padding:14px 32px">
+            📊 View Dashboard
+          </a>
+        </div>
+
+        <div class="hero-stats">
+          <div>
+            <div class="hero-stat-value" id="hero-mol-count">10+</div>
+            <div class="hero-stat-label">Molecules</div>
+          </div>
+          <div>
+            <div class="hero-stat-value" id="hero-tgt-count">7+</div>
+            <div class="hero-stat-label">Drug Targets</div>
+          </div>
+          <div>
+            <div class="hero-stat-value">100%</div>
+            <div class="hero-stat-label">Open Source</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== STATS BAR ===== -->
+<section class="stats-section section-bbt" id="stats">
+  <div class="container">
+    <div class="grid-4">
+      <div class="stat-card animate-slide-up delay-100">
+        <div class="stat-number" id="stat-mol">0</div>
+        <div class="stat-label">Molecules Analyzed</div>
+      </div>
+      <div class="stat-card animate-slide-up delay-200">
+        <div class="stat-number" id="stat-tgt">0</div>
+        <div class="stat-label">Drug Targets</div>
+      </div>
+      <div class="stat-card animate-slide-up delay-300">
+        <div class="stat-number" id="stat-seq">0</div>
+        <div class="stat-label">Sequences Processed</div>
+      </div>
+      <div class="stat-card animate-slide-up delay-400">
+        <div class="stat-number" id="stat-pass">0</div>
+        <div class="stat-label">Lipinski Compliant</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section class="section-bbt" id="features">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">Platform Capabilities</span>
+      <h2 class="section-title">Everything You Need for<br/>Modern Drug Discovery</h2>
+      <p class="section-subtitle">From raw sequences to clinical candidates — a complete bioinformatics toolkit.</p>
+    </div>
+
+    <div class="grid-3">
+      <!-- Feature 1 -->
+      <div class="glass-card tilt-card feature-card animate-fade-scale delay-100">
+        <div class="feature-icon-wrap cyan">🧬</div>
+        <div class="feature-title">Sequence Analysis</div>
+        <p class="feature-desc">
+          Full DNA, RNA, and protein sequence analysis with GC content, ORF detection, 
+          codon usage, melting temperature, pairwise alignment, and secondary structure prediction.
+        </p>
+        <a href="sequence.html" class="btn-ghost-bbt mt-3">Analyze Now →</a>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="glass-card tilt-card feature-card animate-fade-scale delay-200">
+        <div class="feature-icon-wrap purple">⚗️</div>
+        <div class="feature-title">Molecule Library</div>
+        <p class="feature-desc">
+          Manage your compound collection with Lipinski Rule of Five evaluation, drug-likeness scoring, 
+          SMILES notation support, and target association tracking.
+        </p>
+        <a href="molecules.html" class="btn-ghost-bbt mt-3">Browse Library →</a>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="glass-card tilt-card feature-card animate-fade-scale delay-300">
+        <div class="feature-icon-wrap green">🎯</div>
+        <div class="feature-title">Drug Targets</div>
+        <p class="feature-desc">
+          Explore protein targets with binding affinity scores, protein family classification, 
+          organism mapping, and binding site annotations.
+        </p>
+        <a href="targets.html" class="btn-ghost-bbt mt-3">Explore Targets →</a>
+      </div>
+
+      <!-- Feature 4 -->
+      <div class="glass-card tilt-card feature-card animate-fade-scale delay-400">
+        <div class="feature-icon-wrap pink">📊</div>
+        <div class="feature-title">Analytics Dashboard</div>
+        <p class="feature-desc">
+          Real-time charts powered by Chart.js — pipeline progress, target family distributions, 
+          Lipinski compliance radar, and discovery success metrics.
+        </p>
+        <a href="dashboard.html" class="btn-ghost-bbt mt-3">View Dashboard →</a>
+      </div>
+
+      <!-- Feature 5 -->
+      <div class="glass-card tilt-card feature-card animate-fade-scale delay-500">
+        <div class="feature-icon-wrap orange">🔗</div>
+        <div class="feature-title">Biopython Engine</div>
+        <p class="feature-desc">
+          Real bioinformatics computations via Biopython — ProteinAnalysis, pairwise2 alignment, 
+          SeqUtils, ExPASy integration, and BLAST-ready infrastructure.
+        </p>
+        <div class="btn-ghost-bbt mt-3" style="cursor:default;opacity:0.6">Powered by Biopython</div>
+      </div>
+
+      <!-- Feature 6 -->
+      <div class="glass-card tilt-card feature-card animate-fade-scale delay-600">
+        <div class="feature-icon-wrap cyan" style="background:rgba(124,77,255,0.15)">🗄️</div>
+        <div class="feature-title">REST API + Database</div>
+        <p class="feature-desc">
+          Flask REST API with SQLite (dev) / PostgreSQL (prod) backend. 
+          Full CRUD for molecules, targets, and sequences with JSON responses.
+        </p>
+        <div class="btn-ghost-bbt mt-3" style="cursor:default;opacity:0.6">Flask + SQLAlchemy</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PIPELINE ===== -->
+<section class="section-bbt" id="pipeline" style="background:linear-gradient(135deg,rgba(0,212,255,0.02),rgba(124,77,255,0.02))">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">Discovery Pipeline</span>
+      <h2 class="section-title">From Target to Treatment</h2>
+      <p class="section-subtitle">Track compounds through every stage of the drug discovery process.</p>
+    </div>
+
+    <div class="glass-card p-4">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+        <div class="pipeline-step">
+          <div class="pipeline-dot">1</div>
+          <div class="pipeline-label">Target<br/>ID</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-dot" style="background:linear-gradient(135deg,#7c4dff,#ff4da6)">2</div>
+          <div class="pipeline-label">Hit<br/>Finding</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-dot" style="background:linear-gradient(135deg,#ff4da6,#ff8c42)">3</div>
+          <div class="pipeline-label">Lead<br/>Opt.</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-dot" style="background:linear-gradient(135deg,#ff8c42,#ffd700)">4</div>
+          <div class="pipeline-label">Pre-<br/>clinical</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-dot" style="background:linear-gradient(135deg,#ffd700,#00ff88)">5</div>
+          <div class="pipeline-label">Clinical<br/>Trial</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-dot" style="background:linear-gradient(135deg,#00ff88,#00d4ff)">6</div>
+          <div class="pipeline-label">FDA<br/>Approval</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Pipeline Numbers -->
+    <div class="grid-3 mt-4" id="pipeline-live">
+      <!-- loaded by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="section-bbt">
+  <div class="container text-center">
+    <div class="glass-card p-5 animate-pulse-glow">
+      <h2 class="section-title mb-3">Ready to Discover?</h2>
+      <p class="section-subtitle mb-4">Start analyzing sequences, exploring targets, and managing your drug pipeline today.</p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+        <a href="sequence.html" class="btn-primary-bbt" style="font-size:1rem;padding:14px 36px">🧬 Analyze Sequence</a>
+        <a href="molecules.html" class="btn-outline-bbt" style="font-size:1rem;padding:14px 36px">⚗️ Browse Molecules</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer-bbt">
+  <div class="container">
+    <div class="mb-3">
+      <span style="font-family:var(--font-display);font-size:1.2rem;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">BioDiscover</span>
+    </div>
+    <p>Drug Discovery + Bioinformatics Platform | Built with Flask · Biopython · Three.js · Chart.js</p>
+    <p class="mt-2" style="font-size:0.75rem">© 2024 BioDiscover Platform. For research use.</p>
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="js/api.js"></script>
+<script src="js/three-scene.js"></script>
+<script>
+  // Navbar scroll effect
+  window.addEventListener("scroll", () => {
+    document.getElementById("main-navbar").classList.toggle("scrolled", window.scrollY > 40);
+  });
+
+  // Generate background particles
+  (function () {
+    const bg = document.getElementById("particle-bg");
+    if (!bg) return;
+    for (let i = 0; i < 30; i++) {
+      const p = document.createElement("div");
+      p.className = "particle";
+      p.style.cssText = `
+        left:${Math.random()*100}%;
+        top:${Math.random()*100}%;
+        animation-delay:${Math.random()*6}s;
+        animation-duration:${4+Math.random()*6}s;
+        opacity:${0.1+Math.random()*0.4};
+        width:${2+Math.random()*4}px;
+        height:${2+Math.random()*4}px;
+        background:${["#00d4ff","#7c4dff","#00ff88","#ff4da6"][Math.floor(Math.random()*4)]};
+      `;
+      bg.appendChild(p);
+    }
+  })();
+
+  // Load live stats
+  async function loadHeroStats() {
+    try {
+      const stats = await api.get("/api/dashboard/stats");
+      animateCounter(document.getElementById("stat-mol"), stats.totals.molecules);
+      animateCounter(document.getElementById("stat-tgt"), stats.totals.targets);
+      animateCounter(document.getElementById("stat-seq"), stats.totals.sequences);
+      animateCounter(document.getElementById("stat-pass"), stats.totals.lipinski_pass);
+
+      document.getElementById("hero-mol-count").textContent = stats.totals.molecules + "+";
+      document.getElementById("hero-tgt-count").textContent = stats.totals.targets + "+";
+
+      // Pipeline live
+      const pipeEl = document.getElementById("pipeline-live");
+      if (pipeEl && stats.pipeline) {
+        pipeEl.innerHTML = Object.entries(stats.pipeline)
+          .filter(([_, v]) => v > 0)
+          .map(([stage, count]) => `
+            <div class="glass-card p-3 text-center">
+              <div style="font-family:var(--font-display);font-size:2rem;font-weight:700;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">${count}</div>
+              <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted)">${stage}</div>
+            </div>
+          `).join("");
+      }
+    } catch (e) {
+      console.warn("Could not load stats:", e.message);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", loadHeroStats);
+</script>
+</body>
+</html>
