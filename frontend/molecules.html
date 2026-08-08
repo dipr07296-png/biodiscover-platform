@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Molecule Library — BioDiscover</title>
+  <meta name="description" content="Browse and manage drug candidates with Lipinski Rule of Five evaluation and drug-likeness scoring." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚗️</text></svg>" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar-bbt scrolled">
+  <a href="index.html" class="navbar-brand-bbt">
+    <div class="brand-icon">🧬</div>
+    <span class="brand-text">BioDiscover</span>
+  </a>
+  <ul class="navbar-nav-bbt">
+    <li><a href="index.html" class="nav-link-bbt">Home</a></li>
+    <li><a href="dashboard.html" class="nav-link-bbt">Dashboard</a></li>
+    <li><a href="sequence.html" class="nav-link-bbt">Sequence Analysis</a></li>
+    <li><a href="molecules.html" class="nav-link-bbt active">Molecule Library</a></li>
+    <li><a href="targets.html" class="nav-link-bbt">Drug Targets</a></li>
+  </ul>
+  <div class="navbar-actions">
+    <button class="btn-primary-bbt" onclick="openAddMolecule()">+ Add Molecule</button>
+  </div>
+</nav>
+
+<div class="page-wrapper">
+<div class="container-fluid px-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+      <h1 class="page-title">⚗️ Molecule Library</h1>
+      <p class="page-subtitle">Drug candidates with Lipinski Rule of Five evaluation</p>
+    </div>
+    <button class="btn-primary-bbt" onclick="openAddMolecule()">+ Add Molecule</button>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="grid-4 mb-4">
+    <div class="glass-card stat-widget">
+      <div class="sw-value" id="mol-total">—</div>
+      <div class="sw-label">Total Molecules</div>
+    </div>
+    <div class="glass-card stat-widget green">
+      <div class="sw-value" id="mol-pass">—</div>
+      <div class="sw-label">Lipinski Pass</div>
+    </div>
+    <div class="glass-card stat-widget purple">
+      <div class="sw-value" id="mol-approved">—</div>
+      <div class="sw-label">Approved Drugs</div>
+    </div>
+    <div class="glass-card stat-widget orange">
+      <div class="sw-value" id="mol-avgmw">—</div>
+      <div class="sw-label">Avg MW (Da)</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="glass-card p-3 mb-4">
+    <div class="row g-3 align-items-center">
+      <div class="col-lg-4">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="mol-search" class="form-bbt search-input" placeholder="Search molecules..." />
+        </div>
+      </div>
+      <div class="col-lg-2">
+        <select id="filter-status" class="form-bbt">
+          <option value="">All Statuses</option>
+          <option value="Approved">Approved</option>
+          <option value="Clinical Trial">Clinical Trial</option>
+          <option value="Preclinical">Preclinical</option>
+          <option value="Lead">Lead</option>
+          <option value="Hit">Hit</option>
+          <option value="Screening">Screening</option>
+        </select>
+      </div>
+      <div class="col-lg-3">
+        <select id="filter-target" class="form-bbt">
+          <option value="">All Targets</option>
+        </select>
+      </div>
+      <div class="col-lg-2">
+        <select id="filter-lipinski" class="form-bbt">
+          <option value="">All (Lipinski)</option>
+          <option value="pass">Pass Only</option>
+          <option value="fail">Fail Only</option>
+        </select>
+      </div>
+      <div class="col-lg-1">
+        <button class="btn-ghost-bbt w-100" onclick="loadMolecules()">↻</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Molecule Grid -->
+  <div class="grid-auto" id="mol-grid">
+    <div class="empty-state" style="grid-column:1/-1">
+      <div class="spinner-bbt mx-auto"></div>
+    </div>
+  </div>
+
+</div><!-- /container-fluid -->
+</div><!-- /page-wrapper -->
+
+<!-- ===== Add Molecule Modal ===== -->
+<div class="modal fade" id="add-mol-modal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content" style="background:var(--bg-secondary);border:1px solid var(--glass-border);border-radius:var(--card-radius)">
+      <div class="modal-header" style="border-bottom:1px solid var(--glass-border)">
+        <h5 class="modal-title text-gradient" style="font-family:var(--font-display)">⚗️ Add New Molecule</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label-bbt">Molecule Name *</label>
+            <input type="text" id="mol-name-input" class="form-bbt" placeholder="e.g. Imatinib" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label-bbt">Status</label>
+            <select id="mol-status-input" class="form-bbt">
+              <option value="Screening">Screening</option>
+              <option value="Hit">Hit</option>
+              <option value="Lead">Lead</option>
+              <option value="Preclinical">Preclinical</option>
+              <option value="Clinical Trial">Clinical Trial</option>
+              <option value="Approved">Approved</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="form-label-bbt">SMILES Notation</label>
+            <input type="text" id="mol-smiles-input" class="form-bbt" placeholder="e.g. Cc1ccc(cc1Nc2nccc(n2)..." style="font-family:var(--font-mono);font-size:0.8rem" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label-bbt" data-tooltip="Molecular weight in Daltons">MW (Da)</label>
+            <input type="number" id="mol-mw-input" class="form-bbt" placeholder="0.0" step="0.1" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label-bbt" data-tooltip="Partition coefficient">LogP</label>
+            <input type="number" id="mol-logp-input" class="form-bbt" placeholder="0.0" step="0.01" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label-bbt" data-tooltip="H-bond donors ≤ 5">HBD</label>
+            <input type="number" id="mol-hbd-input" class="form-bbt" placeholder="0" min="0" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label-bbt" data-tooltip="H-bond acceptors ≤ 10">HBA</label>
+            <input type="number" id="mol-hba-input" class="form-bbt" placeholder="0" min="0" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label-bbt" data-tooltip="Topological polar surface area ≤ 140 Ų">TPSA (Ų)</label>
+            <input type="number" id="mol-tpsa-input" class="form-bbt" placeholder="0.0" step="0.1" />
+          </div>
+          <div class="col-md-9">
+            <label class="form-label-bbt">Drug Target</label>
+            <select id="mol-target-input" class="form-bbt">
+              <option value="">No target assigned</option>
+            </select>
+          </div>
+        </div>
+        <div class="alert-bbt alert-info mt-3" style="font-size:0.82rem">
+          <span>ℹ</span>
+          <span>Lipinski Rule of Five will be automatically evaluated: MW≤500, LogP≤5, HBD≤5, HBA≤10</span>
+        </div>
+      </div>
+      <div class="modal-footer" style="border-top:1px solid var(--glass-border)">
+        <button class="btn-ghost-bbt" data-bs-dismiss="modal">Cancel</button>
+        <button id="submit-mol-btn" class="btn-primary-bbt" onclick="submitMolecule()">Add Molecule</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Molecule Detail Modal ===== -->
+<div class="modal fade" id="mol-detail-modal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content" style="background:var(--bg-secondary);border:1px solid var(--glass-border);border-radius:var(--card-radius)">
+      <div class="modal-header" style="border-bottom:1px solid var(--glass-border)">
+        <h5 class="modal-title" style="color:var(--text-primary)">🔬 Molecule Details</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4" id="mol-detail-body">
+        <div class="text-center py-4"><div class="spinner-bbt mx-auto"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer-bbt">
+  <p>BioDiscover Platform | Lipinski Rule of Five · Drug-likeness Scoring</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/api.js"></script>
+<script src="js/molecules.js"></script>
+<script>
+  // Populate target dropdown in add modal
+  document.addEventListener("DOMContentLoaded", async () => {
+    try {
+      const targets = await api.get("/api/targets");
+      const sel = document.getElementById("mol-target-input");
+      if (sel) {
+        targets.forEach(t => {
+          const opt = document.createElement("option");
+          opt.value = t.id;
+          opt.textContent = t.name;
+          sel.appendChild(opt);
+        });
+      }
+    } catch(e) { console.warn("Targets load:", e.message); }
+  });
+</script>
+</body>
+</html>
