@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sequence Analysis — BioDiscover</title>
+  <meta name="description" content="Analyze DNA, RNA, and protein sequences using Biopython. GC content, ORF detection, codon usage, and pairwise alignment." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧬</text></svg>" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar-bbt scrolled">
+  <a href="index.html" class="navbar-brand-bbt">
+    <div class="brand-icon">🧬</div>
+    <span class="brand-text">BioDiscover</span>
+  </a>
+  <ul class="navbar-nav-bbt">
+    <li><a href="index.html" class="nav-link-bbt">Home</a></li>
+    <li><a href="dashboard.html" class="nav-link-bbt">Dashboard</a></li>
+    <li><a href="sequence.html" class="nav-link-bbt active">Sequence Analysis</a></li>
+    <li><a href="molecules.html" class="nav-link-bbt">Molecule Library</a></li>
+    <li><a href="targets.html" class="nav-link-bbt">Drug Targets</a></li>
+  </ul>
+  <div class="navbar-actions">
+    <a href="sequence.html" class="btn-primary-bbt">🔬 Analyze</a>
+  </div>
+</nav>
+
+<div class="page-wrapper">
+<div class="container">
+
+  <!-- Header -->
+  <div class="mb-4">
+    <h1 class="page-title">🧬 Sequence Analysis</h1>
+    <p class="page-subtitle">Analyze DNA, RNA, or protein sequences using Biopython algorithms</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-bbt">
+    <button class="tab-btn-bbt active" id="tab-analyze" onclick="switchTab('analyze')">🔬 Analyze</button>
+    <button class="tab-btn-bbt" id="tab-align" onclick="switchTab('align')">⇌ Align</button>
+    <button class="tab-btn-bbt" id="tab-history" onclick="switchTab('history')">📋 History</button>
+  </div>
+
+  <!-- ===== TAB: ANALYZE ===== -->
+  <div id="panel-analyze">
+    <div class="row g-4">
+      <!-- Input Panel -->
+      <div class="col-lg-5">
+        <div class="glass-card p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 style="font-weight:700;color:var(--text-primary);margin:0">Input Sequence</h5>
+            <div style="display:flex;gap:6px">
+              <button class="btn-ghost-bbt" onclick="insertSample('dna')">DNA</button>
+              <button class="btn-ghost-bbt" onclick="insertSample('protein')">Protein</button>
+              <button class="btn-ghost-bbt" onclick="insertSample('rna')">RNA</button>
+            </div>
+          </div>
+
+          <div class="form-group-bbt">
+            <label class="form-label-bbt" for="seq-name">Sequence Name</label>
+            <input type="text" id="seq-name" class="form-bbt" placeholder="e.g. EGFR Exon 19 Fragment" />
+          </div>
+
+          <div class="form-group-bbt">
+            <label class="form-label-bbt" for="seq-input">Sequence (FASTA or raw)</label>
+            <textarea id="seq-input" class="form-bbt seq-input-area" rows="12"
+              placeholder=">Optional FASTA header&#10;ATGGCTTCTTGGCAGATCTTGAGAGCCCAAG...&#10;&#10;Or paste raw sequence directly"></textarea>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button id="analyze-btn" class="btn-primary-bbt" style="flex:1;justify-content:center" onclick="analyzeSequence()">
+              🔬 Analyze Sequence
+            </button>
+            <button class="btn-ghost-bbt" onclick="clearForm()" title="Clear">✕</button>
+          </div>
+
+          <div class="divider"></div>
+          <div style="font-size:0.78rem;color:var(--text-muted)">
+            ⌨️ <strong>Ctrl+Enter</strong> to analyze quickly. 
+            Supports DNA, RNA, and protein sequences. FASTA headers are stripped automatically.
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Panel -->
+      <div class="col-lg-7">
+        <div id="results-section" style="display:none">
+          
+          <!-- Type Badge -->
+          <div style="margin-bottom:1rem">
+            <span id="seq-type-badge"></span>
+          </div>
+
+          <!-- Basic Metrics Grid -->
+          <div class="grid-3 mb-4">
+            <div class="glass-card seq-result-card">
+              <div class="metric-label">Length</div>
+              <div class="metric-value" id="res-length">—</div>
+            </div>
+            <div class="glass-card seq-result-card">
+              <div class="metric-label">GC Content</div>
+              <div class="metric-value green" id="res-gc">—</div>
+            </div>
+            <div class="glass-card seq-result-card" id="res-atgc-card">
+              <div class="metric-label">AT/GC Ratio</div>
+              <div class="metric-value" id="res-atgc">—</div>
+            </div>
+            <div class="glass-card seq-result-card" id="res-tm-card">
+              <div class="metric-label">Melting Temp</div>
+              <div class="metric-value purple" id="res-tm">—</div>
+            </div>
+            <div class="glass-card seq-result-card" id="res-orf-card">
+              <div class="metric-label">ORFs Found</div>
+              <div class="metric-value pink" id="res-orfs">—</div>
+            </div>
+            <div class="glass-card seq-result-card">
+              <div class="metric-label" id="extra-label">MW / PI</div>
+              <div class="metric-value" id="res-mw">—</div>
+            </div>
+          </div>
+
+          <!-- DNA-specific section -->
+          <div id="dna-section">
+            <!-- GC Gauge + Composition -->
+            <div class="row g-3 mb-4">
+              <div class="col-6">
+                <div class="glass-card p-3">
+                  <div class="chart-title">GC Content</div>
+                  <canvas id="gcChart" style="max-height:180px"></canvas>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="glass-card p-3">
+                  <div class="chart-title">Nucleotide Composition</div>
+                  <canvas id="compositionChart" style="max-height:180px"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sequences -->
+            <div class="glass-card p-3 mb-3">
+              <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px">Derived Sequences</div>
+              <div class="result-metric">
+                <span class="metric-label">mRNA Transcript</span>
+                <code class="metric-value" id="res-mrna" style="font-size:0.72rem;word-break:break-all;text-align:right;max-width:60%">—</code>
+              </div>
+              <div class="result-metric">
+                <span class="metric-label">Protein Translation</span>
+                <code class="metric-value green" id="res-protein" style="font-size:0.72rem;word-break:break-all;text-align:right;max-width:60%">—</code>
+              </div>
+            </div>
+
+            <!-- ORF Table -->
+            <div class="glass-card p-3 mb-3">
+              <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px">Open Reading Frames</div>
+              <table class="orf-table">
+                <thead><tr><th>Start</th><th>End</th><th>Length</th></tr></thead>
+                <tbody id="orf-tbody"><tr><td colspan="3" style="color:var(--text-muted)">—</td></tr></tbody>
+              </table>
+            </div>
+
+            <!-- Codon Usage -->
+            <div class="glass-card p-3 mb-3">
+              <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px">Top Codon Usage</div>
+              <div class="codon-grid" id="codon-display"></div>
+            </div>
+          </div>
+
+          <!-- Protein-specific section -->
+          <div id="protein-section" style="display:none">
+            <div class="row g-3 mb-4">
+              <div class="col-6">
+                <div class="glass-card p-3">
+                  <div class="chart-title">Secondary Structure</div>
+                  <canvas id="ssChart" style="max-height:200px"></canvas>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="glass-card p-3">
+                  <div class="chart-title">Protein Properties</div>
+                  <div class="result-metric">
+                    <span class="metric-label">Isoelectric Point</span>
+                    <span class="metric-value" id="res-pi">—</span>
+                  </div>
+                  <div class="result-metric">
+                    <span class="metric-label">Instability</span>
+                    <span class="metric-value pink" id="res-instab">—</span>
+                  </div>
+                  <div class="result-metric">
+                    <span class="metric-label">GRAVY</span>
+                    <span class="metric-value" id="res-gravy">—</span>
+                  </div>
+                  <div class="result-metric">
+                    <span class="metric-label">Charge @ pH 7</span>
+                    <span class="metric-value purple" id="res-charge">—</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- AA composition -->
+            <div class="glass-card p-3 mb-3">
+              <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:12px">Amino Acid Composition</div>
+              <div id="aa-comp-display"></div>
+            </div>
+          </div>
+
+        </div><!-- /results-section -->
+
+        <!-- Empty state -->
+        <div id="empty-state">
+          <div class="glass-card p-5 text-center">
+            <div style="font-size:4rem;margin-bottom:1rem;opacity:0.3">🔬</div>
+            <div style="color:var(--text-muted);font-size:1.1rem">Enter a sequence and click Analyze</div>
+            <div style="color:var(--text-muted);font-size:0.85rem;margin-top:0.5rem">
+              Supports DNA, RNA, and protein sequences
+            </div>
+            <div style="display:flex;gap:10px;justify-content:center;margin-top:2rem">
+              <button class="btn-ghost-bbt" onclick="insertSample('dna')">Try DNA Sample</button>
+              <button class="btn-ghost-bbt" onclick="insertSample('protein')">Try Protein Sample</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TAB: ALIGN ===== -->
+  <div id="panel-align" style="display:none">
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <div class="glass-card p-4">
+          <h5 style="font-weight:700;color:var(--text-primary);margin-bottom:1.5rem">Pairwise Alignment</h5>
+          <div class="form-group-bbt">
+            <label class="form-label-bbt">Sequence 1</label>
+            <textarea id="align-seq1" class="form-bbt seq-input-area" rows="5" placeholder="Enter first sequence (DNA or Protein)"></textarea>
+          </div>
+          <div class="form-group-bbt">
+            <label class="form-label-bbt">Sequence 2</label>
+            <textarea id="align-seq2" class="form-bbt seq-input-area" rows="5" placeholder="Enter second sequence"></textarea>
+          </div>
+          <button id="align-btn" class="btn-primary-bbt w-100 justify-content-center" onclick="runAlignment()">
+            ⇌ Run Pairwise Alignment
+          </button>
+          <div class="divider"></div>
+          <div style="font-size:0.78rem;color:var(--text-muted)">
+            Uses Biopython <code>pairwise2.align.globalms</code> with match=2, mismatch=-1, open=-0.5, extend=-0.1
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div id="align-result" style="display:none"></div>
+        <div id="align-empty" class="glass-card p-5 text-center">
+          <div style="font-size:3rem;margin-bottom:1rem;opacity:0.3">⇌</div>
+          <div style="color:var(--text-muted)">Enter two sequences to align</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TAB: HISTORY ===== -->
+  <div id="panel-history" style="display:none">
+    <div class="glass-card p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 style="font-weight:700;color:var(--text-primary);margin:0">Analysis History</h5>
+        <button class="btn-ghost-bbt" onclick="loadHistory()">↻ Refresh</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr>
+              <th style="padding:10px 8px;text-align:left;font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);border-bottom:1px solid var(--glass-border)">ID</th>
+              <th style="padding:10px 8px;text-align:left;font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);border-bottom:1px solid var(--glass-border)">Name</th>
+              <th style="padding:10px 8px;text-align:left;font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);border-bottom:1px solid var(--glass-border)">Type</th>
+              <th style="padding:10px 8px;text-align:left;font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);border-bottom:1px solid var(--glass-border)">Length</th>
+              <th style="padding:10px 8px;text-align:left;font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);border-bottom:1px solid var(--glass-border)">GC%</th>
+              <th style="padding:10px 8px;text-align:left;font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);border-bottom:1px solid var(--glass-border)">Date</th>
+            </tr>
+          </thead>
+          <tbody id="history-tbody">
+            <tr><td colspan="6" class="text-center py-4" style="color:var(--text-muted)">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+</div><!-- /page-wrapper -->
+
+<footer class="footer-bbt">
+  <p>BioDiscover Platform | Powered by Biopython</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="js/api.js"></script>
+<script src="js/sequence.js"></script>
+<script>
+  function switchTab(tab) {
+    ["analyze","align","history"].forEach(t => {
+      document.getElementById("panel-" + t).style.display = t === tab ? "block" : "none";
+      document.getElementById("tab-" + t).classList.toggle("active", t === tab);
+    });
+    if (tab === "history") loadHistory();
+  }
+
+  // Show/hide empty state when results appear
+  const origRender = window.renderResults;
+  if (origRender) {
+    window.renderResults = function(data) {
+      document.getElementById("empty-state").style.display = "none";
+      origRender(data);
+    };
+  }
+
+  // Hide empty state on analyze
+  document.getElementById("analyze-btn").addEventListener("click", function() {
+    const seq = document.getElementById("seq-input").value.trim();
+    if (seq) document.getElementById("empty-state").style.display = "none";
+  });
+</script>
+</body>
+</html>
